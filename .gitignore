@@ -1,0 +1,21 @@
+# JDK (portable, 304MB)
+jdk17/
+
+# Kafka (123MB + 117MB archive)
+kafka_2.13-3.9.2/
+kafka.tgz
+
+# Runtime data
+kafka_data/
+checkpoint/
+
+# Python
+__pycache__/
+*.pyc
+
+# Output (regenerate with scripts)
+output/
+
+# IDE
+.vscode/
+.idea/
