@@ -2,11 +2,9 @@
 # 生成6张分析图表
 
 import pandas as pd
-import numpy as np
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-import matplotlib.font_manager as fm
 import os
 
 # 中文字体
@@ -32,7 +30,6 @@ print("加载数据...")
 hour_df = load("hour_stats.csv")
 hot_df = load("hot_top10.csv")
 cat_df = load("category_stats.csv")
-rate_df = load("interaction_rate.csv")
 
 # ===== 图1: 24小时活跃度 =====
 print("[1/6] 24小时活跃度趋势")
@@ -150,10 +147,12 @@ plt.savefig(CHART_DIR + '04_recommendation.png', dpi=150, bbox_inches='tight')
 plt.close()
 print("  已保存")
 
-# ===== 图5: 行为构成 =====
+# ===== 图5: 行为构成（从实际数据统计） =====
 print("[5/6] 行为构成")
-actions = ['Play', 'Like', 'Comment', 'Share', 'Favorite', 'Follow']
-counts = [54721, 18196, 10128, 8010, 5923, 3022]
+behavior_df = pd.read_csv("D:/Spark/data/video_behavior_history.csv")
+action_counts = behavior_df['Action'].value_counts()
+actions = ['play', 'like', 'comment', 'share', 'favorite', 'follow']
+counts = [action_counts.get(a, 0) for a in actions]
 act_colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD']
 
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
@@ -162,8 +161,14 @@ ax1.pie(counts, labels=actions, autopct='%1.1f%%', colors=act_colors,
         startangle=90, explode=(0.05, 0, 0, 0, 0, 0))
 ax1.set_title('Action Distribution')
 
+p = action_counts.get('play', 0)
+l = action_counts.get('like', 0)
+c = action_counts.get('comment', 0)
+s = action_counts.get('share', 0)
+f = action_counts.get('favorite', 0)
+fw = action_counts.get('follow', 0)
 funnel_labels = ['Play', 'Interaction\n(like/comment/share)', 'Favorite', 'Follow']
-funnel_vals = [54721, 36334, 5923, 3022]
+funnel_vals = [p, l + c + s, f, fw]
 funnel_colors = ['#FF6B6B', '#4ECDC4', '#FFEAA7', '#DDA0DD']
 bars = ax2.barh(funnel_labels, funnel_vals, color=funnel_colors, edgecolor='white')
 for bar, v in zip(bars, funnel_vals):
